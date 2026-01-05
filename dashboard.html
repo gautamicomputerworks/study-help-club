@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Study Help Club - Dashboard</title>
+  <style>
+    body { font-family: Arial; background:#f2f4f8; padding:30px; }
+    h1 { text-align:center; color:#1a73e8; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
+    .card { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+    button { background:#1a73e8; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; width:100%; }
+    textarea, select, input { width:100%; padding:8px; margin-bottom:10px; }
+    .item { background:#eef2f7; padding:10px; border-radius:6px; margin-top:10px; }
+    .answer { margin-left:15px; margin-top:5px; background:#e0e7ff; padding:8px; border-radius:6px; }
+  </style>
+</head>
+
+<body>
+
+<h1>Study Help Club</h1>
+
+<div class="grid">
+
+  <!-- Ask Doubt -->
+  <div class="card">
+    <h3>Ask a Doubt</h3>
+    <textarea id="doubtText" placeholder="Type your doubt..."></textarea>
+    <button onclick="postDoubt()">Post Doubt</button>
+    <div id="doubtList"></div>
+  </div>
+
+  <!-- Answer Doubt -->
+  <div class="card">
+    <h3>Answer a Specific Doubt</h3>
+    <select id="doubtSelect">
+      <option value="">Select a doubt</option>
+    </select>
+    <textarea id="answerText" placeholder="Write your answer..."></textarea>
+    <button onclick="postAnswer()">Submit Answer</button>
+  </div>
+
+  <!-- Upload Notes -->
+  <div class="card">
+    <h3>Upload Notes</h3>
+    <input type="file" id="noteFile">
+    <button onclick="uploadNote()">Upload</button>
+    <div id="notesList"></div>
+  </div>
+
+</div>
+
+<script>
+  let doubts = [];
+
+  function postDoubt() {
+    const text = document.getElementById("doubtText").value.trim();
+    if (!text) {
+      alert("Please write a doubt");
+      return;
+    }
+
+    const doubtObj = { question: text, answers: [] };
+    doubts.push(doubtObj);
+
+    document.getElementById("doubtText").value = "";
+    renderDoubts();
+    updateDropdown();
+  }
+
+  function postAnswer() {
+    const index = document.getElementById("doubtSelect").value;
+    const answer = document.getElementById("answerText").value.trim();
+
+    if (index === "" || !answer) {
+      alert("Select a doubt and write an answer");
+      return;
+    }
+
+    doubts[index].answers.push(answer);
+    document.getElementById("answerText").value = "";
+    renderDoubts();
+  }
+
+  function renderDoubts() {
+    const container = document.getElementById("doubtList");
+    container.innerHTML = "";
+
+    doubts.forEach((d, i) => {
+      let div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = "<b>Q:</b> " + d.question;
+
+      d.answers.forEach(a => {
+        let ans = document.createElement("div");
+        ans.className = "answer";
+        ans.innerHTML = "<b>Answer:</b> " + a;
+        div.appendChild(ans);
+      });
+
+      container.appendChild(div);
+    });
+  }
+
+  function updateDropdown() {
+    const select = document.getElementById("doubtSelect");
+    select.innerHTML = '<option value="">Select a doubt</option>';
+
+    doubts.forEach((d, i) => {
+      let opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = d.question;
+      select.appendChild(opt);
+    });
+  }
+
+  function uploadNote() {
+    const file = document.getElementById("noteFile").files[0];
+    if (!file) {
+      alert("Choose a file");
+      return;
+    }
+
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerText = "📄 " + file.name;
+    document.getElementById("notesList").appendChild(div);
+  }
+</script>
+
+</body>
+</html>
