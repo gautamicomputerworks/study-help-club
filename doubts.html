@@ -1,72 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>Doubts - Study Help Club</title>
 
   <style>
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       background: #f2f4f8;
-      padding: 30px;
+      padding: 20px;
     }
 
     h1 {
-      color: #1a73e8;
       text-align: center;
+      color: #1a73e8;
     }
 
     .card {
       background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
-    textarea, select {
+    select, textarea {
       width: 100%;
-      padding: 10px;
       margin-bottom: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      padding: 8px;
     }
 
     button {
+      width: 100%;
+      padding: 10px;
       background: #1a73e8;
       color: white;
       border: none;
-      padding: 10px;
-      border-radius: 6px;
+      border-radius: 5px;
       cursor: pointer;
-      width: 100%;
     }
 
-    .item {
+    .doubt {
       background: #eef2f7;
       padding: 10px;
-      border-radius: 6px;
       margin-top: 10px;
+      border-radius: 5px;
     }
 
     .answer {
-      background: #e0e7ff;
+      margin-left: 15px;
       margin-top: 5px;
-      padding: 8px;
-      border-radius: 6px;
-    }
-
-    .subject {
-      font-size: 12px;
-      font-weight: bold;
-      color: #555;
+      background: #e0e7ff;
+      padding: 6px;
+      border-radius: 5px;
     }
   </style>
 </head>
 
 <body>
 
-<button onclick="location.href='dashboard.html'">⬅ Back to Dashboard</button>
+<button onclick="goBack()">⬅ Back to Dashboard</button>
 
 <h1>Ask & Answer Doubts</h1>
 
@@ -79,98 +71,99 @@
     <option>RDBMS</option>
     <option>C Language</option>
     <option>Python</option>
-    <option>Other</option>
   </select>
 
-  <textarea id="doubtText" placeholder="Type your doubt..."></textarea>
-  <button onclick="postDoubt()">Post Doubt</button>
-
-  <div id="doubtList"></div>
+  <textarea id="question" placeholder="Type your doubt here"></textarea>
+  <button onclick="addDoubt()">Post Doubt</button>
 </div>
 
 <div class="card">
   <h3>Answer a Doubt</h3>
 
-  <select id="doubtSelect">
+  <select id="doubtListSelect">
     <option value="">Select a doubt</option>
   </select>
 
-  <textarea id="answerText" placeholder="Write your answer..."></textarea>
-  <button onclick="postAnswer()">Submit Answer</button>
+  <textarea id="answerText" placeholder="Write your answer"></textarea>
+  <button onclick="addAnswer()">Submit Answer</button>
+</div>
+
+<div class="card">
+  <h3>All Doubts</h3>
+  <div id="display"></div>
 </div>
 
 <script>
-  let doubts = [];
+  var doubts = [];
 
-  function postDoubt() {
-    const text = document.getElementById("doubtText").value.trim();
-    const subject = document.getElementById("subject").value;
+  function addDoubt() {
+    var subject = document.getElementById("subject").value;
+    var question = document.getElementById("question").value;
 
-    if (!text || !subject) {
-      alert("Please select subject and write a doubt");
+    if (subject === "" || question === "") {
+      alert("Please select subject and write doubt");
       return;
     }
 
     doubts.push({
       subject: subject,
-      question: text,
+      question: question,
       answers: []
     });
 
-    document.getElementById("doubtText").value = "";
     document.getElementById("subject").value = "";
+    document.getElementById("question").value = "";
 
-    renderDoubts();
-    updateDropdown();
+    updateUI();
   }
 
-  function postAnswer() {
-    const index = document.getElementById("doubtSelect").value;
-    const answer = document.getElementById("answerText").value.trim();
+  function addAnswer() {
+    var index = document.getElementById("doubtListSelect").value;
+    var answer = document.getElementById("answerText").value;
 
-    if (index === "" || !answer) {
-      alert("Select doubt and write answer");
+    if (index === "" || answer === "") {
+      alert("Select a doubt and write answer");
       return;
     }
 
     doubts[index].answers.push(answer);
     document.getElementById("answerText").value = "";
-    renderDoubts();
+
+    updateUI();
   }
 
-  function renderDoubts() {
-    const container = document.getElementById("doubtList");
-    container.innerHTML = "";
+  function updateUI() {
+    var display = document.getElementById("display");
+    var select = document.getElementById("doubtListSelect");
 
-    doubts.forEach(d => {
-      let div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
-        <div class="subject">[${d.subject}]</div>
-        <b>Q:</b> ${d.question}
-      `;
-
-      d.answers.forEach(a => {
-        let ans = document.createElement("div");
-        ans.className = "answer";
-        ans.innerHTML = "<b>Answer:</b> " + a;
-        div.appendChild(ans);
-      });
-
-      container.appendChild(div);
-    });
-  }
-
-  function updateDropdown() {
-    const select = document.getElementById("doubtSelect");
+    display.innerHTML = "";
     select.innerHTML = '<option value="">Select a doubt</option>';
 
-    doubts.forEach((d, i) => {
-      let opt = document.createElement("option");
+    for (var i = 0; i < doubts.length; i++) {
+      var d = doubts[i];
+
+      var div = document.createElement("div");
+      div.className = "doubt";
+      div.innerHTML = "<b>[" + d.subject + "]</b> " + d.question;
+
+      for (var j = 0; j < d.answers.length; j++) {
+        var ans = document.createElement("div");
+        ans.className = "answer";
+        ans.innerHTML = "<b>Answer:</b> " + d.answers[j];
+        div.appendChild(ans);
+      }
+
+      display.appendChild(div);
+
+      var opt = document.createElement("option");
       opt.value = i;
-      opt.textContent = [${d.subject}] ${d.question};
+      opt.text = "[" + d.subject + "] " + d.question;
       select.appendChild(opt);
-    });
+    }
+  }
+
+  function goBack() {
+    window.location.href = "dashboard.html";
   }
 </script>
 
