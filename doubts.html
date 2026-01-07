@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Doubts - Study Help Club</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f2f4f8;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #1a73e8;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .item {
+      background: #eef2f7;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    .answer {
+      background: #e0e7ff;
+      margin-top: 5px;
+      padding: 8px;
+      border-radius: 6px;
+    }
+
+    .subject {
+      font-size: 12px;
+      font-weight: bold;
+      color: #555;
+    }
+  </style>
+</head>
+
+<body>
+
+<button onclick="location.href='dashboard.html'">⬅ Back to Dashboard</button>
+
+<h1>Ask & Answer Doubts</h1>
+
+<div class="card">
+  <h3>Ask a Doubt</h3>
+
+  <select id="subject">
+    <option value="">Select Subject</option>
+    <option>DSA</option>
+    <option>RDBMS</option>
+    <option>C Language</option>
+    <option>Python</option>
+    <option>Other</option>
+  </select>
+
+  <textarea id="doubtText" placeholder="Type your doubt..."></textarea>
+  <button onclick="postDoubt()">Post Doubt</button>
+
+  <div id="doubtList"></div>
+</div>
+
+<div class="card">
+  <h3>Answer a Doubt</h3>
+
+  <select id="doubtSelect">
+    <option value="">Select a doubt</option>
+  </select>
+
+  <textarea id="answerText" placeholder="Write your answer..."></textarea>
+  <button onclick="postAnswer()">Submit Answer</button>
+</div>
+
+<script>
+  let doubts = [];
+
+  function postDoubt() {
+    const text = document.getElementById("doubtText").value.trim();
+    const subject = document.getElementById("subject").value;
+
+    if (!text || !subject) {
+      alert("Please select subject and write a doubt");
+      return;
+    }
+
+    doubts.push({
+      subject: subject,
+      question: text,
+      answers: []
+    });
+
+    document.getElementById("doubtText").value = "";
+    document.getElementById("subject").value = "";
+
+    renderDoubts();
+    updateDropdown();
+  }
+
+  function postAnswer() {
+    const index = document.getElementById("doubtSelect").value;
+    const answer = document.getElementById("answerText").value.trim();
+
+    if (index === "" || !answer) {
+      alert("Select doubt and write answer");
+      return;
+    }
+
+    doubts[index].answers.push(answer);
+    document.getElementById("answerText").value = "";
+    renderDoubts();
+  }
+
+  function renderDoubts() {
+    const container = document.getElementById("doubtList");
+    container.innerHTML = "";
+
+    doubts.forEach(d => {
+      let div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="subject">[${d.subject}]</div>
+        <b>Q:</b> ${d.question}
+      `;
+
+      d.answers.forEach(a => {
+        let ans = document.createElement("div");
+        ans.className = "answer";
+        ans.innerHTML = "<b>Answer:</b> " + a;
+        div.appendChild(ans);
+      });
+
+      container.appendChild(div);
+    });
+  }
+
+  function updateDropdown() {
+    const select = document.getElementById("doubtSelect");
+    select.innerHTML = '<option value="">Select a doubt</option>';
+
+    doubts.forEach((d, i) => {
+      let opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = [${d.subject}] ${d.question};
+      select.appendChild(opt);
+    });
+  }
+</script>
+
+</body>
+</html>
